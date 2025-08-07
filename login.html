@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion avec Entra ID</title>
+    <script src="https://alcdn.msauth.net/browser/2.38.4/js/msal-browser.min.js"></script>
+</head>
+<body>
+    <h2>Connexion via Microsoft</h2>
+    <button id="loginBtn">Se connecter avec Microsoft</button>
+    <button id="logoutBtn" style="display:none;">Se déconnecter</button>
+
+    <div id="userInfo" style="display:none; margin-top: 20px;">
+        <p><strong>Nom :</strong> <span id="userName"></span></p>
+        <p><strong>Email :</strong> <span id="userEmail"></span></p>
+    </div>
+
+    <script>
+        const msalConfig = {
+            auth: {
+                clientId: "222217cf-2e49-41e4-a5a2-c4a1838a3046", // remplace par le tien
+                authority: "https://login.microsoftonline.com/1324dfb4-4457-41c3-a943-293c61bbd70c", // remplace par le tien
+                redirectUri: window.location.origin
+            }
+        };
+
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+
+        const loginRequest = {
+            scopes: ["User.Read"]
+        };
+
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userInfoDiv = document.getElementById('userInfo');
+
+        loginBtn.onclick = async () => {
+            try {
+                const loginResponse = await msalInstance.loginPopup(loginRequest);
+                const account = loginResponse.account;
+
+                const tokenResponse = await msalInstance.acquireTokenSilent({
+                    ...loginRequest,
+                    account: account
+                });
+
+                const graphResponse = await fetch("https://graph.microsoft.com/v1.0/me", {
+                    headers: {
+                        Authorization: `Bearer ${tokenResponse.accessToken}`
+                    }
+                });
+
+                const user = await graphResponse.json();
+                document.getElementById('userName').textContent = user.displayName;
+                document.getElementById('userEmail').textContent = user.mail || user.userPrincipalName;
+
+                userInfoDiv.style.display = "block";
+                loginBtn.style.display = "none";
+                logoutBtn.style.display = "inline-block";
+
+            } catch (error) {
+                console.error(error);
+                alert("Erreur de connexion : " + error.message);
+            }
+        };
+
+        logoutBtn.onclick = async () => {
+            await msalInstance.logoutPopup();
+            userInfoDiv.style.display = "none";
+            loginBtn.style.display = "inline-block";
+            logoutBtn.style.display = "none";
+        };
+    </script>
+</body>
+</html>
