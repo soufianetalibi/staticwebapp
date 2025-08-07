@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Azure AD</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/msal/2.38.3/msal.min.js"></script>
+    <title>Mon App - Connexion Entra ID</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/msal/2.38.4/msal.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -23,307 +23,209 @@
 
         .container {
             background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            width: 90%;
-            transition: all 0.3s ease;
-        }
-
-        .container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-        }
-
-        .login-section {
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
             text-align: center;
-            padding: 2rem;
-        }
-
-        .dashboard-section {
-            display: none;
         }
 
         .logo {
             width: 80px;
             height: 80px;
-            background: linear-gradient(45deg, #0078d4, #106ebe);
+            background: linear-gradient(45deg, #0078d4, #00bcf2);
             border-radius: 50%;
-            margin: 0 auto 1rem;
+            margin: 0 auto 30px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 36px;
             color: white;
-            font-size: 2rem;
             font-weight: bold;
         }
 
         h1 {
             color: #333;
-            margin-bottom: 0.5rem;
-            font-size: 2rem;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 600;
         }
 
         .subtitle {
             color: #666;
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
+            margin-bottom: 40px;
+            font-size: 16px;
         }
 
-        .btn {
-            background: linear-gradient(45deg, #0078d4, #106ebe);
+        .login-section {
+            margin-bottom: 30px;
+        }
+
+        .ms-login-btn {
+            background: #0078d4;
             color: white;
             border: none;
             padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
+            width: 100%;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            min-width: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .btn:hover {
+        .ms-login-btn:hover {
+            background: #106ebe;
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 120, 212, 0.3);
-            background: linear-gradient(45deg, #106ebe, #005a9e);
+            box-shadow: 0 5px 15px rgba(16, 110, 190, 0.4);
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-logout {
-            background: linear-gradient(45deg, #dc3545, #c82333);
-            margin-left: 1rem;
-            min-width: 120px;
-        }
-
-        .btn-logout:hover {
-            background: linear-gradient(45deg, #c82333, #bd2130);
-            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+        .ms-login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .user-info {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+            display: none;
         }
 
-        .user-info::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.5s;
-        }
-
-        .user-info:hover::before {
-            left: 100%;
+        .user-info.show {
+            display: block;
         }
 
         .user-avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: linear-gradient(45deg, #28a745, #20c997);
-            margin: 0 auto 1rem;
+            margin: 0 auto 20px;
+            background: #0078d4;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 2rem;
+            font-size: 24px;
             font-weight: bold;
         }
 
         .user-name {
-            font-size: 1.5rem;
+            font-size: 20px;
+            font-weight: 600;
             color: #333;
-            margin-bottom: 0.5rem;
+            margin-bottom: 8px;
         }
 
         .user-email {
             color: #666;
-            font-size: 1rem;
+            margin-bottom: 20px;
         }
 
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
         }
 
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            border-left: 5px solid #0078d4;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .card h3 {
-            color: #333;
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-        }
-
-        .card p {
-            color: #666;
-            line-height: 1.6;
+        .logout-btn:hover {
+            background: #c82333;
         }
 
         .loading {
             display: none;
-            text-align: center;
             color: #666;
-            font-style: italic;
+            margin-top: 20px;
         }
 
         .error {
-            display: none;
             background: #f8d7da;
             color: #721c24;
-            padding: 1rem;
-            border-radius: 10px;
-            margin: 1rem 0;
-            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
         }
 
-        .actions {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin: 1rem;
-                padding: 1.5rem;
-            }
-
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .actions {
-                flex-direction: column;
-            }
-
-            .btn {
-                min-width: 100%;
-            }
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(0, 120, 212, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(0, 120, 212, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(0, 120, 212, 0);
-            }
+        .ms-icon {
+            width: 20px;
+            height: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Section de connexion -->
-        <div id="loginSection" class="login-section">
-            <div class="logo">AD</div>
-            <h1>Bienvenue</h1>
-            <p class="subtitle">Connectez-vous avec votre compte Azure Active Directory</p>
-            <div class="loading" id="loading">Connexion en cours...</div>
-            <div class="error" id="error"></div>
-            <button class="btn pulse" id="loginBtn" onclick="signIn()">
-                Se connecter avec Azure AD
+            <div class="container">
+        <div class="logo">A</div>
+        <h1>Mon Application</h1>
+        <p class="subtitle">Connectez-vous avec votre compte Microsoft</p>
+        
+        <!-- Instructions de configuration -->
+        <div class="config-info" id="configInfo" style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin-bottom: 20px; font-size: 14px; text-align: left;">
+            <strong>⚙️ Configuration requise :</strong>
+            <ol style="margin: 10px 0; padding-left: 20px;">
+                <li>Créez une App Registration dans Azure Portal</li>
+                <li>Copiez le Client ID dans le code (ligne 118)</li>
+                <li>Ajoutez cette URL dans les URI de redirection : <code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px;"></code></li>
+                <li>Permissions API : User.Read</li>
+            </ol>
+        </div>
+        
+        <div class="login-section">
+            <button id="loginBtn" class="ms-login-btn">
+                <svg class="ms-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.5 0H0v9.5h9.5V0zM20 0h-9.5v9.5H20V0zM0 10.5v9.5h9.5v-9.5H0zM10.5 10.5V20H20v-9.5h-9.5z"/>
+                </svg>
+                Se connecter avec Microsoft
             </button>
         </div>
 
-        <!-- Section tableau de bord -->
-        <div id="dashboardSection" class="dashboard-section">
-            <div class="user-info">
-                <div class="user-avatar" id="userAvatar"></div>
-                <div class="user-name" id="userName">Nom d'utilisateur</div>
-                <div class="user-email" id="userEmail">email@example.com</div>
-            </div>
+        <div class="loading" id="loading">
+            Connexion en cours...
+        </div>
 
-            <div class="dashboard-grid">
-                <div class="card">
-                    <h3>🏠 Tableau de bord</h3>
-                    <p>Accédez à vos informations personnelles et gérez vos préférences.</p>
-                </div>
+        <div class="error" id="error"></div>
 
-                <div class="card">
-                    <h3>📊 Rapports</h3>
-                    <p>Consultez vos rapports et analyses de performance en temps réel.</p>
-                </div>
-
-                <div class="card">
-                    <h3>⚙️ Paramètres</h3>
-                    <p>Configurez vos préférences et paramètres de sécurité.</p>
-                </div>
-
-                <div class="card">
-                    <h3>👥 Équipe</h3>
-                    <p>Collaborez avec votre équipe et gérez les permissions d'accès.</p>
-                </div>
-
-                <div class="card">
-                    <h3>📝 Documents</h3>
-                    <p>Accédez à vos documents partagés et créez de nouveaux fichiers.</p>
-                </div>
-
-                <div class="card">
-                    <h3>📈 Analytics</h3>
-                    <p>Analysez vos données et générez des insights métier.</p>
-                </div>
-            </div>
-
-            <div class="actions">
-                <button class="btn" onclick="showProfile()">Voir le profil</button>
-                <button class="btn btn-logout" onclick="signOut()">Se déconnecter</button>
-            </div>
+        <div class="user-info" id="userInfo">
+            <div class="user-avatar" id="userAvatar"></div>
+            <div class="user-name" id="userName"></div>
+            <div class="user-email" id="userEmail"></div>
+            <button class="logout-btn" id="logoutBtn">Se déconnecter</button>
         </div>
     </div>
 
     <script>
-        // Configuration MSAL
-        // IMPORTANT: Remplacez ces valeurs par vos vraies valeurs Azure AD
+        // Configuration MSAL - VOUS DEVEZ MODIFIER CES VALEURS
         const msalConfig = {
             auth: {
-                clientId: "de4983e7-2cfc-4a63-bd64-bb610fe5a565", // Remplacez par votre Client ID
-                authority: "https://login.microsoftonline.com/1324dfb4-4457-41c3-a943-293c61bbd70c", // Remplacez par votre Tenant ID
-                redirectUri: window.location.origin
+                clientId: "222217cf-2e49-41e4-a5a2-c4a1838a3046", // Remplacez par votre Client ID réel
+                authority: "https://login.microsoftonline.com/common", // Pour multi-tenant, ou remplacez 'common' par votre Tenant ID
+                redirectUri: window.location.origin,
+                postLogoutRedirectUri: window.location.origin,
+                navigateToLoginRequestUrl: false
             },
             cache: {
-                cacheLocation: "sessionStorage",
+                cacheLocation: "sessionStorage", // Plus sécurisé pour les demos
                 storeAuthStateInCookie: false
+            },
+            system: {
+                loggerOptions: {
+                    loggerCallback: (level, message, containsPii) => {
+                        if (containsPii) return;
+                        console.log(message);
+                    }
+                }
             }
         };
 
@@ -331,162 +233,177 @@
             scopes: ["User.Read"]
         };
 
-        // Initialisation de MSAL
-        let msalInstance;
-        let currentUser = null;
+        // Initialiser MSAL
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-        // Fonction d'initialisation
-        function initializeApp() {
-            try {
-                msalInstance = new msal.PublicClientApplication(msalConfig);
-                checkIfUserIsSignedIn();
-            } catch (error) {
-                console.error('Erreur d\'initialisation MSAL:', error);
-                showError('Erreur de configuration. Veuillez vérifier les paramètres Azure AD.');
-            }
-        }
+        // Éléments DOM
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userInfo = document.getElementById('userInfo');
+        const loading = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
 
         // Vérifier si l'utilisateur est déjà connecté
-        function checkIfUserIsSignedIn() {
-            const accounts = msalInstance.getAllAccounts();
-            if (accounts.length > 0) {
-                currentUser = accounts[0];
-                showDashboard();
+        async function checkIfLoggedIn() {
+            try {
+                // Vérifier d'abord si MSAL est correctement configuré
+                if (!msalConfig.auth.clientId || msalConfig.auth.clientId === "VOTRE_CLIENT_ID") {
+                    showError("❌ Configuration requise: Veuillez configurer votre Client ID dans le code");
+                    return;
+                }
+
+                await msalInstance.initialize();
+                const accounts = msalInstance.getAllAccounts();
+                if (accounts.length > 0) {
+                    showUserInfo(accounts[0]);
+                }
+            } catch (error) {
+                console.error('Erreur lors de la vérification de connexion:', error);
+                showError("Erreur de configuration MSAL: " + error.message);
             }
         }
 
         // Fonction de connexion
-        async function signIn() {
-            if (!msalInstance) {
-                showError('Service d\'authentification non initialisé.');
-                return;
-            }
-
-            showLoading(true);
-            hideError();
-
+        async function login() {
             try {
+                // Vérifications préalables
+                if (!msalConfig.auth.clientId || msalConfig.auth.clientId === "VOTRE_CLIENT_ID") {
+                    showError("❌ Veuillez d'abord configurer votre Client ID Azure dans le code");
+                    return;
+                }
+
+                showLoading(true);
+                hideError();
+                
+                // Initialiser MSAL si pas déjà fait
+                await msalInstance.initialize();
+                
+                // Tentative de connexion popup
                 const loginResponse = await msalInstance.loginPopup(loginRequest);
-                currentUser = loginResponse.account;
-                showDashboard();
+                console.log('Connexion réussie:', loginResponse);
+                
+                // Obtenir les informations utilisateur
+                await getUserInfo(loginResponse.account);
+                
             } catch (error) {
                 console.error('Erreur de connexion:', error);
-                if (error.errorCode === 'popup_window_error') {
-                    showError('Impossible d\'ouvrir la fenêtre de connexion. Veuillez désactiver le bloqueur de popups.');
-                } else if (error.errorCode === 'user_cancelled') {
-                    showError('Connexion annulée par l\'utilisateur.');
+                
+                let errorMessage = "Erreur de connexion: ";
+                
+                if (error.errorCode === "invalid_client") {
+                    errorMessage += "Client ID invalide. Vérifiez votre configuration Azure.";
+                } else if (error.errorCode === "invalid_request") {
+                    errorMessage += "Requête invalide. Vérifiez l'URI de redirection dans Azure.";
+                } else if (error.errorCode === "unauthorized_client") {
+                    errorMessage += "Client non autorisé. Vérifiez les permissions dans Azure.";
+                } else if (error.message.includes("popup_window_error")) {
+                    errorMessage += "Popup bloquée. Autorisez les popups et réessayez.";
                 } else {
-                    showError('Erreur de connexion. Veuillez réessayer.');
+                    errorMessage += error.message;
                 }
+                
+                showError(errorMessage);
             } finally {
                 showLoading(false);
             }
         }
 
-        // Fonction de déconnexion
-        async function signOut() {
-            // Si en mode démo (pas de msalInstance ou client ID non configuré)
-            if (!msalInstance || msalConfig.auth.clientId === "YOUR_CLIENT_ID") {
-                currentUser = null;
-                showLogin();
-                return;
-            }
-
-            // Déconnexion Azure AD normale
-            if (!currentUser) return;
-
+        // Fonction pour obtenir les infos utilisateur
+        async function getUserInfo(account) {
             try {
-                await msalInstance.logoutPopup({
-                    account: currentUser
+                const tokenRequest = {
+                    scopes: ["User.Read"],
+                    account: account
+                };
+
+                const tokenResponse = await msalInstance.acquireTokenSilent(tokenRequest);
+                
+                // Appel à Microsoft Graph API
+                const response = await fetch('https://graph.microsoft.com/v1.0/me', {
+                    headers: {
+                        'Authorization': 'Bearer ' + tokenResponse.accessToken
+                    }
                 });
-                currentUser = null;
-                showLogin();
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    showUserInfo(account, userData);
+                } else {
+                    throw new Error('Impossible d\'obtenir les informations utilisateur');
+                }
+
+            } catch (error) {
+                console.error('Erreur lors de l\'obtention des infos utilisateur:', error);
+                showUserInfo(account); // Afficher au moins les infos de base
+            }
+        }
+
+        // Afficher les informations utilisateur
+        function showUserInfo(account, userData = null) {
+            const userName = userData?.displayName || account.name || 'Utilisateur';
+            const userEmail = userData?.mail || account.username || 'Email non disponible';
+            
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userEmail').textContent = userEmail;
+            
+            // Avatar avec initiales
+            const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            document.getElementById('userAvatar').textContent = initials;
+            
+            userInfo.classList.add('show');
+            document.querySelector('.login-section').style.display = 'none';
+        }
+
+        // Fonction de déconnexion
+        async function logout() {
+            try {
+                await msalInstance.logoutPopup();
+                
+                // Réinitialiser l'interface
+                userInfo.classList.remove('show');
+                document.querySelector('.login-section').style.display = 'block';
+                hideError();
+                
             } catch (error) {
                 console.error('Erreur de déconnexion:', error);
-                // Forcer la déconnexion locale même si la déconnexion popup échoue
-                currentUser = null;
-                showLogin();
+                showError('Erreur de déconnexion: ' + error.message);
             }
-        }
-
-        // Afficher le tableau de bord
-        function showDashboard() {
-            if (!currentUser) return;
-
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('dashboardSection').style.display = 'block';
-
-            // Remplir les informations utilisateur
-            const displayName = currentUser.name || 'Utilisateur';
-            const email = currentUser.username || 'email@example.com';
-            
-            document.getElementById('userName').textContent = displayName;
-            document.getElementById('userEmail').textContent = email;
-            
-            // Créer avatar avec initiales
-            const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-            document.getElementById('userAvatar').textContent = initials;
-        }
-
-        // Afficher la page de connexion
-        function showLogin() {
-            document.getElementById('dashboardSection').style.display = 'none';
-            document.getElementById('loginSection').style.display = 'block';
-        }
-
-        // Afficher le profil utilisateur
-        function showProfile() {
-            if (!currentUser) return;
-            
-            alert(`Profil utilisateur:\n\nNom: ${currentUser.name}\nEmail: ${currentUser.username}\nTenant ID: ${currentUser.tenantId}`);
         }
 
         // Fonctions utilitaires
         function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'block' : 'none';
-            document.getElementById('loginBtn').style.display = show ? 'none' : 'block';
+            loading.style.display = show ? 'block' : 'none';
+            loginBtn.disabled = show;
         }
 
         function showError(message) {
-            const errorDiv = document.getElementById('error');
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
         }
 
         function hideError() {
-            document.getElementById('error').style.display = 'none';
+            errorDiv.style.display = 'none';
         }
 
-        // Mode démo (pour tester sans Azure AD configuré)
-        function enableDemoMode() {
-            console.log('Mode démo activé');
-            currentUser = {
-                name: 'Utilisateur Démo',
-                username: 'demo@example.com',
-                tenantId: 'demo-tenant'
-            };
-            showDashboard();
-        }
+        // Event listeners
+        loginBtn.addEventListener('click', login);
+        logoutBtn.addEventListener('click', logout);
 
-        // Vérifier la configuration et activer le mode démo si nécessaire
-        function checkConfiguration() {
-            if (msalConfig.auth.clientId === "YOUR_CLIENT_ID") {
-                console.warn('Configuration Azure AD non définie. Activation du mode démo.');
-                
-                // Remplacer le bouton de connexion par un bouton démo
-                const loginBtn = document.getElementById('loginBtn');
-                loginBtn.textContent = 'Mode Démo (Configurer Azure AD)';
-                loginBtn.onclick = enableDemoMode;
-                
-                // Afficher un message d'information
-                showError('Configuration Azure AD requise. Mode démo activé pour les tests.');
-            } else {
-                initializeApp();
+        // Vérifier la connexion au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            // Afficher l'URL actuelle dans les instructions
+            const urlElement = document.querySelector('#configInfo code');
+            if (urlElement) {
+                urlElement.textContent = window.location.origin;
             }
-        }
-
-        // Initialiser l'application au chargement de la page
-        document.addEventListener('DOMContentLoaded', checkConfiguration);
+            
+            // Masquer les instructions si la config semble OK
+            if (msalConfig.auth.clientId && msalConfig.auth.clientId !== "VOTRE_CLIENT_ID") {
+                document.getElementById('configInfo').style.display = 'none';
+            }
+            
+            checkIfLoggedIn();
+        });
     </script>
 </body>
 </html>
